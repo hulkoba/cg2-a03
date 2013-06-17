@@ -12,10 +12,12 @@
 
 /* requireJS module definition */
 define(["text!shaders/vertex_color.vs", "text!shaders/vertex_color.fs",
-        "text!shaders/phong.vs",        "text!shaders/phong.fs"
+        "text!shaders/phong.vs",        "text!shaders/phong.fs",
+        "text!shaders/planet.vs",        "text!shaders/planet.fs"
        ], 
        (function( vertex_color_vs, vertex_color_fs,
-                  phong_vs,        phong_fs
+                  phong_vs,        phong_fs,
+                  planet_vs,       planet_fs
                  ) {
 
     "use strict";

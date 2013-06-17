@@ -30,6 +30,12 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.programs.phong.use();
         this.programs.phong.setUniform("ambientLight", "vec3", [0.4,0.4,0.4]);
 
+        // create WebGL program for planetPhong illumination 
+        this.programs.planet = new Program(gl, Shader("planet_vs"), 
+                                              Shader("planet_fs")  );
+        this.programs.planet.use();
+        this.programs.planet.setUniform("ambientLight", "vec3", [0.4,0.4,0.4]);
+
         // in 3.2 create textures from image files here...
         
         // in 3.2, bind textures to GPU programs in the following callback func
@@ -48,7 +54,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         // light source 
         this.sun = new light.DirectionalLight("light",  
                                               {"direction": [-1,0,0], "color": [1,1,1] },
-                                              [this.programs.phong]); 
+                                              [this.programs.phong, this.programs.planet]); 
         this.sunNode = new SceneNode("Sunlight", [this.sun]);
                                 
         // equator ring for orientation
@@ -65,12 +71,12 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         // planet
         this.planetSurface = new parametric.Sphere(gl, 1.0, {"uSegments": 80, "vSegments": 80 });
         this.planetMaterial = this.ringMaterial;
-        this.planetNode = new SceneNode("Planet", [this.planetMaterial, this.planetSurface], this.programs.phong);
+        this.planetNode = new SceneNode("Planet", [this.planetMaterial, this.planetSurface], this.programs.planet);
         // rotate sphere so the poles are on the Y axis
         mat4.rotate(this.planetNode.transformation, Math.PI/2, [1,0,0]);
 
         // the root node is our little "universe"
-        this.universe = new SceneNode("Universe", [this.sunNode, this.planetNode, this.ringNode], this.programs.phong);
+        this.universe = new SceneNode("Universe", [this.sunNode, this.planetNode, this.ringNode], this.programs.planet);
 
         // the scene has an attribute "drawOptions" that is used by 
         // the HtmlController. Each attribute in this.drawOptions 
@@ -78,6 +84,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.drawOptions = { 
                              "Show Planet": true,
                              "Show Ring": false,
+                             "Debug": false
                              };                       
     };
 
