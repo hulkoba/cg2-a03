@@ -60,8 +60,8 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         // equator ring for orientation
         this.ringGeometry = new parametric.Torus(gl, 1.2, 0.04, {"uSegments":80, "vSegments":40});
         this.ringMaterial = new material.PhongMaterial("material", 
-                                                       {"ambient":   [0.1,0.1,0.2],
-                                                        "diffuse":   [0.8,0.2,0.2],
+                                                       {"ambient":   [0.2,0.2,0.2],
+                                                        "diffuse":   [0.1,1.0,0.1],
                                                         "specular":  [0.4,0.4,0.4],
                                                         "shininess": 80              });
         this.ringNode     = new SceneNode("Ring", [this.ringMaterial, this.ringGeometry], this.programs.phong);
@@ -70,13 +70,17 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
 
         // planet
         this.planetSurface = new parametric.Sphere(gl, 1.0, {"uSegments": 80, "vSegments": 80 });
-        this.planetMaterial = this.ringMaterial;
+        this.planetMaterial = new material.PhongMaterial("material", 
+                                                       {"ambient":   [0.2,0.2,0.2],
+                                                        "diffuse":   [0.8,0.2,0.2],
+                                                        "specular":  [0.4,0.4,0.4],
+                                                        "shininess": 80              });
         this.planetNode = new SceneNode("Planet", [this.planetMaterial, this.planetSurface], this.programs.planet);
         // rotate sphere so the poles are on the Y axis
         mat4.rotate(this.planetNode.transformation, Math.PI/2, [1,0,0]);
 
-        // the root node is our little "universe"
-        this.universe = new SceneNode("Universe", [this.sunNode, this.planetNode, this.ringNode], this.programs.planet);
+        // the root node is our little "universe"                                             //vorher programs.planet
+        this.universe = new SceneNode("Universe", [this.sunNode, this.planetNode, this.ringNode], this.programs.phong);
 
         // the scene has an attribute "drawOptions" that is used by 
         // the HtmlController. Each attribute in this.drawOptions 
@@ -84,7 +88,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.drawOptions = { 
                              "Show Planet": true,
                              "Show Ring": false,
-                             "Debug": false
+                             "Debug": true
                              };                       
     };
 
@@ -119,6 +123,9 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         // show/hide certain parts of the scene            
         this.ringNode.visible = this.drawOptions["Show Ring"];
         this.planetNode.visible = this.drawOptions["Show Planet"];
+
+
+        this.programs.planet.setUniform("debug", "bool", this.drawOptions["Debug"]);
 
         // draw the scene 
         this.universe.draw(gl, this.programs.blue, modelViewMatrix);

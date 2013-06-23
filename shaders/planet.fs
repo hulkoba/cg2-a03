@@ -44,6 +44,8 @@ struct LightSource {
 } ;
 uniform LightSource light;
 
+uniform bool debug;
+
 /*
 
  Calculate surface color based on Phong illumination model.
@@ -53,6 +55,7 @@ uniform LightSource light;
  + assuming directional light
  
  */
+
 vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) {
 
     // vector from light to current point
@@ -65,10 +68,20 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     // all sides of the object
     vec3 ambient = material.ambient * ambientLight;
 
+   
+
+
+
     // is the current fragment's normal pointing away from the light?
     // then we are on the "back" side of the object, as seen from the light
-    if(ndotl<=0.0)
+    if(ndotl<=0.0 || debug == false)
         return ambient;
+        
+    if(debug == true && ndotl>0.0 && ndotl<0.03)
+      ambient = vec3(0.0, 1.0, 0.0);
+    
+   
+
 
     // diffuse contribution
     vec3 diffuseCoeff = material.diffuse;
