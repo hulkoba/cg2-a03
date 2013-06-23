@@ -74,12 +74,15 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
     // is the current fragment's normal pointing away from the light?
     // then we are on the "back" side of the object, as seen from the light
-    if(ndotl<=0.0 || debug == false)
+    if(ndotl < 0.0 )
         return ambient;
         
-    if(debug == true && ndotl>0.0 && ndotl<0.03)
+    if(debug == true && ndotl >= 0.0 && ndotl < 0.03)
       ambient = vec3(0.0, 1.0, 0.0);
     
+    if(debug == false){
+        ambient = material.ambient * ambientLight;
+    }
    
 
 

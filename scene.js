@@ -61,7 +61,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.ringGeometry = new parametric.Torus(gl, 1.2, 0.04, {"uSegments":80, "vSegments":40});
         this.ringMaterial = new material.PhongMaterial("material", 
                                                        {"ambient":   [0.2,0.2,0.2],
-                                                        "diffuse":   [0.1,1.0,0.1],
+                                                        "diffuse":   [0.1,0.1,1.0],
                                                         "specular":  [0.4,0.4,0.4],
                                                         "shininess": 80              });
         this.ringNode     = new SceneNode("Ring", [this.ringMaterial, this.ringGeometry], this.programs.phong);
