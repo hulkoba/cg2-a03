@@ -231,6 +231,7 @@ define(["util", "vbo"],
         sphere.texCoords = function(u,v) {
             return [ 0.5 + u/(Math.PI*2), v/(Math.PI) ];
         };
+
         
         var conf = {"uMin": 0, "uMax": 2*Math.PI, 
                     "vMin": 0, "vMax": Math.PI, 

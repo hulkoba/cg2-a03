@@ -17,7 +17,7 @@ varying vec4  ecPosition;
 varying vec3  ecNormal;
 
 
-varying vec2 verTexCoords_fs;
+varying vec2 vertexTexCoords_fs;
 
 // transformation matrices
 uniform mat4  modelViewMatrix;
@@ -77,15 +77,10 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
     // is the current fragment's normal pointing away from the light?
     // then we are on the "back" side of the object, as seen from the light
-    if(ndotl < 0.0 )
-        return ambient;
-
-
-
-
+    
     
     //draw the green border between 0 and 3°    
-    if(debug == true && ndotl >= 0.0 && ndotl < 0.03){
+    if(debug && ndotl >= 0.0 && ndotl < 0.03){
       ambient = vec3(0.0, 1.0, 0.0);
     }
     
@@ -94,7 +89,6 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     }
    
 
-
     // diffuse contribution
     vec3 diffuseCoeff = material.diffuse;
     vec3 diffuse = diffuseCoeff * light.color * ndotl;
@@ -102,12 +96,13 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
     //draw texture stripes 
     if(debug){
-        if(mod(verTexCoords_fs.s , 0.05) >= 0.025){
+        if(mod(vertexTexCoords_fs.s , 0.05) >= 0.025){
             ambient = ambient * 0.8 + diffuse * 0.8;
-        //} else {
-          //  ambient = material.ambient * ambientLight;
         }
     }
+  
+    if(ndotl < 0.0 )
+        return ambient;
 
     
 

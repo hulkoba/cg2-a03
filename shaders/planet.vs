@@ -19,7 +19,7 @@ attribute vec3 vertexPosition;
 attribute vec3 vertexNormal;
 
 
-attribute vec2 verTexCoords;
+attribute vec2 vertexTexCoords;
 
 
 uniform mat4 modelViewMatrix;
@@ -30,7 +30,7 @@ varying vec4 ecPosition;
 varying vec3 ecNormal;
 
 
-varying vec2 verTexCoords_fs;
+varying vec2 vertexTexCoords_fs;
 
 void main() {
     
@@ -43,7 +43,7 @@ void main() {
     gl_Position  = projectionMatrix * ecPosition;
 
 
-    verTexCoords_fs = verTexCoords;
+    vertexTexCoords_fs = vertexTexCoords;
     
 }
 
