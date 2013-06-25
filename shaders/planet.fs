@@ -50,8 +50,9 @@ uniform LightSource light;
 
 
 uniform bool debug;
-uniform bool daytimeTexture;
+uniform bool worldTexture;
 uniform sampler2D daylightTexture;
+uniform sampler2D nightlightTexture;
 
 /*
 
@@ -77,16 +78,9 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
    
 
-
-
     // is the current fragment's normal pointing away from the light?
     // then we are on the "back" side of the object, as seen from the light
-    
-    
-    //draw the green border between 0 and 3°    
-    if(debug && ndotl >= 0.0 && ndotl < 0.03){
-      ambient = vec3(0.0, 1.0, 0.0);
-    }
+     
     
     if(!debug){
         ambient = material.ambient * ambientLight;
@@ -94,24 +88,32 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
    
 
     // diffuse contribution
-    vec3 colorTex = texture2D(daylightTexture, vertexTexCoords_fs).rgb;
+    vec3 dayTex = texture2D(daylightTexture, vertexTexCoords_fs).rgb;
+    vec3 nightTex = texture2D(nightlightTexture, vertexTexCoords_fs).rgb;
 
     vec3 diffuseCoeff = material.diffuse;
 
-    vec3 diffuse;
+    vec3 diffuse ;
   
+
+    //day or red
+    if(worldTexture){
+        diffuse = dayTex * light.color * ndotl * 0.5;        
+        ambient = nightTex * ambientLight;
+    } else {
+        diffuse = diffuseCoeff * light.color * ndotl;
+        ambient = material.ambient * ambientLight;
+    }
+
+    //draw the green border between 0 and 3°    
+    if(debug && ndotl >= 0.0 && ndotl < 0.03){
+        ambient = vec3(0.0, 1.0, 0.0);
+    }
     //draw texture stripes 
     if(debug){
         if(mod(vertexTexCoords_fs.s , 0.05) >= 0.025){
             ambient = ambient * 0.8 + diffuse * 0.8;
         }
-    }
-
-    //day or red
-    if(daytimeTexture){
-        diffuse = colorTex * light.color * ndotl * 0.5;
-    } else {
-        diffuse = diffuseCoeff * light.color * ndotl;
     }
   
     if(ndotl < 0.0 )
@@ -136,8 +138,6 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     return ambient + diffuse + specular;
     
 }
-
-
 
 void main() {
     

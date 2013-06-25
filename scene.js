@@ -40,7 +40,8 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
 
 
         // in 3.3 create textures from image files here...
-       this.worldTexture = new texture.Texture2D(gl, "textures/earth_month04.jpg");
+       this.dayTexture = new texture.Texture2D(gl, "textures/earth_month04.jpg");
+       this.nightTexture = new texture.Texture2D(gl, "textures/earth_at_night_2048.jpg");
 
 
         
@@ -50,7 +51,8 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
             // ...
             _scene.programs.planet.use();
             //                              uniform-bezeichner, Textureinheit
-            _scene.programs.planet.setTexture("daylightTexture", 0, _scene.worldTexture)
+            _scene.programs.planet.setTexture("daylightTexture", 0, _scene.dayTexture)
+            _scene.programs.planet.setTexture("nightlightTexture", 1, _scene.nightTexture)
 
             _scene.draw();
         } ));
@@ -141,7 +143,8 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
 
         //                       shadervariable, Typ,   JavaScript-Variable
         this.programs.planet.setUniform("debug", "bool", this.drawOptions["Debug"]);
-        this.programs.planet.setUniform("daytimeTexture", "bool", this.drawOptions["Daytime Texture"]);
+        this.programs.planet.setUniform("worldTexture", "bool", this.drawOptions["Daytime Texture"]);
+
 
         // draw the scene 
         this.universe.draw(gl, this.programs.blue, modelViewMatrix);
