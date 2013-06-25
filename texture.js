@@ -89,7 +89,7 @@ define(["util"],
         
         // file to be loaded - now loading will start asynchronously
         _image.src = filename;
-        
+                
     };
 
     // method to set the default parameters for 2D textures

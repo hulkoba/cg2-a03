@@ -19,6 +19,7 @@ varying vec3  ecNormal;
 
 varying vec2 vertexTexCoords_fs;
 
+
 // transformation matrices
 uniform mat4  modelViewMatrix;
 uniform mat4  projectionMatrix;
@@ -47,7 +48,10 @@ struct LightSource {
 } ;
 uniform LightSource light;
 
+
 uniform bool debug;
+uniform bool daytimeTexture;
+uniform sampler2D daylightTexture;
 
 /*
 
@@ -90,8 +94,13 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
    
 
     // diffuse contribution
+    vec3 colorTex = texture2D(daylightTexture, vertexTexCoords_fs).rgb;
+
     vec3 diffuseCoeff = material.diffuse;
-    vec3 diffuse = diffuseCoeff * light.color * ndotl;
+
+    vec3 diffuse = colorTex * light.color * ndotl * 0.5;
+  
+
 
 
     //draw texture stripes 
@@ -116,6 +125,8 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     vec3 specularCoeff = material.specular;
     float shininess = material.shininess;
     vec3 specular = specularCoeff * light.color * pow(rdotv, shininess);
+
+   
  
     // return sum of all contributions
     return ambient + diffuse + specular;

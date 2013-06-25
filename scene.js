@@ -36,14 +36,27 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.programs.planet.use();
         this.programs.planet.setUniform("ambientLight", "vec3", [0.4,0.4,0.4]);
 
-        // in 3.2 create textures from image files here...
+
+
+
+        // in 3.3 create textures from image files here...
+       this.worldTexture = new texture.Texture2D(gl, "textures/earth_month04.jpg");
+
+
         
-        // in 3.2, bind textures to GPU programs in the following callback func
+        // in 3.3, bind textures to GPU programs in the following callback func
         var _scene = this;
         texture.onAllTexturesLoaded( (function() { 
             // ...
+            _scene.programs.planet.use();
+            //                              uniform-bezeichner, Textureinheit
+            _scene.programs.planet.setTexture("daylightTexture", 0, _scene.worldTexture)
+
             _scene.draw();
         } ));
+
+
+
 
         // initial position of the camera
         this.cameraTransformation = mat4.lookAt([0,0.5,3], [0,0,0], [0,1,0]);
@@ -88,7 +101,9 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.drawOptions = { 
                              "Show Planet": true,
                              "Show Ring": false,
-                             "Debug": true
+                             "Debug": true,
+                             "Daytime Texture": false,
+                             "Night Lights":false
                              };                       
     };
 
@@ -124,8 +139,9 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.ringNode.visible = this.drawOptions["Show Ring"];
         this.planetNode.visible = this.drawOptions["Show Planet"];
 
-
+        //                       shadervariable, Typ,   JavaScript-Variable
         this.programs.planet.setUniform("debug", "bool", this.drawOptions["Debug"]);
+        //this.programs.planet.setUniform("daytimeTexture", "bool", this.drawOptions["Daytime Texture"]);
 
         // draw the scene 
         this.universe.draw(gl, this.programs.blue, modelViewMatrix);
