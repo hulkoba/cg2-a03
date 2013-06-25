@@ -98,16 +98,20 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
     vec3 diffuseCoeff = material.diffuse;
 
-    vec3 diffuse = colorTex * light.color * ndotl * 0.5;
+    vec3 diffuse;
   
-
-
-
     //draw texture stripes 
     if(debug){
         if(mod(vertexTexCoords_fs.s , 0.05) >= 0.025){
             ambient = ambient * 0.8 + diffuse * 0.8;
         }
+    }
+
+    //day or red
+    if(daytimeTexture){
+        diffuse = colorTex * light.color * ndotl * 0.5;
+    } else {
+        diffuse = diffuseCoeff * light.color * ndotl;
     }
   
     if(ndotl < 0.0 )

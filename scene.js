@@ -141,7 +141,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
 
         //                       shadervariable, Typ,   JavaScript-Variable
         this.programs.planet.setUniform("debug", "bool", this.drawOptions["Debug"]);
-        //this.programs.planet.setUniform("daytimeTexture", "bool", this.drawOptions["Daytime Texture"]);
+        this.programs.planet.setUniform("daytimeTexture", "bool", this.drawOptions["Daytime Texture"]);
 
         // draw the scene 
         this.universe.draw(gl, this.programs.blue, modelViewMatrix);
