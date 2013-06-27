@@ -104,7 +104,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
                              "Show Planet": true,
                              "Show Ring": false,
                              "Debug": true,
-                             "Daytime Texture": false,
+                             "Daytime Texture": true,
                              "Night Lights":false
                              };
     };
@@ -144,6 +144,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         // shadervariable, Typ, JavaScript-Variable
         this.programs.planet.setUniform("debug", "bool", this.drawOptions["Debug"]);
         this.programs.planet.setUniform("worldTexture", "bool", this.drawOptions["Daytime Texture"]);
+        this.programs.planet.setUniform("night", "bool", this.drawOptions["Night Lights"]);
 
 
         // draw the scene

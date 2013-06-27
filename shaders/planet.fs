@@ -51,6 +51,8 @@ uniform LightSource light;
 
 uniform bool debug;
 uniform bool worldTexture;
+uniform bool night;
+
 uniform sampler2D daylightTexture;
 uniform sampler2D nightlightTexture;
 
@@ -83,7 +85,8 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
      
     
     if(!debug){
-        ambient = material.ambient * ambientLight;
+        //ambient = material.ambient * ambientLight;
+        ambient = ambient;
     }
    
 
@@ -99,10 +102,15 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     //day or red
     if(worldTexture){
         diffuse = dayTex * light.color * ndotl * 0.5;
-        ambient = nightTex * ambientLight;
+
+        if(night){
+           ambient = nightTex * ambientLight; 
+        }
+        
     } else {
         diffuse = diffuseCoeff * light.color * ndotl;
-        ambient = material.ambient * ambientLight;
+        //ambient = material.ambient * ambientLight;
+        ambient = ambient;
     }
 
     //draw the green border between 0 and 3°
