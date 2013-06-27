@@ -103,15 +103,20 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     if(worldTexture){
         diffuse = dayTex * light.color * ndotl * 0.5;
 
-        if(night){
-           ambient = nightTex * ambientLight; 
-        }
+        //if(night && ndotl < 0.0){
+          // ambient = nightTex * ambientLight; 
+        //}
         
     } else {
         diffuse = diffuseCoeff * light.color * ndotl;
         //ambient = material.ambient * ambientLight;
         ambient = ambient;
     }
+    
+    if(night && ndotl < 0.0){
+        ambient = nightTex * ambientLight; 
+    }
+
 
     //draw the green border between 0 and 3°
     if(debug && ndotl >= 0.0 && ndotl < 0.03){
