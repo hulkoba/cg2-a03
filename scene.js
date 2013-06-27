@@ -105,7 +105,8 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
                              "Show Ring": false,
                              "Debug": true,
                              "Daytime Texture": true,
-                             "Night Lights":false
+                             "Night Lights":false,
+                             "Red Green": false
                              };
     };
 
