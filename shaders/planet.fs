@@ -53,6 +53,7 @@ uniform bool debug;
 uniform bool worldTexture;
 uniform bool night;
 uniform bool redgreen;
+uniform bool glossy;
 uniform bool clouds;
 
 // uniform variable for the textrues
@@ -103,7 +104,9 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     // diffuse contribution
     vec3 diffuseCoeff = material.diffuse;
     vec3 diffuse ;
-  
+    
+    
+
     //green land, red water
     if(redgreen){
         diffuse = rgTex * light.color * ndotl;
@@ -142,6 +145,27 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
         ambient = ambient + cloudTex;
     }
 
+      
+
+     // reflected light direction = perfect reflection direction
+    vec3 r = reflect(l,n);
+    
+    // cosine of angle between reflection dir and viewing dir
+    float rdotv = max( dot(r,v), 0.0);
+    
+    // specular contribution
+    vec3 specularCoeff = material.specular;
+    float shininess = material.shininess;
+    vec3 specular = specularCoeff * light.color * pow(rdotv, shininess);
+
+
+    //spacular light depends on water ...
+   // if(glossy){
+        //material.specular || && material. shininess verändern
+        // je nachdem ob auf wasser oder land
+
+   // }
+
     //draw the green border between 0 and 3°
     if(debug && ndotl >= 0.0 && ndotl < 0.03){
         ambient = vec3(0.0, 1.0, 0.0);
@@ -155,21 +179,6 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
   
     if(ndotl < 0.0 )
         return ambient;
-
-    
-
-     // reflected light direction = perfect reflection direction
-    vec3 r = reflect(l,n);
-    
-    // cosine of angle between reflection dir and viewing dir
-    float rdotv = max( dot(r,v), 0.0);
-    
-    // specular contribution
-    vec3 specularCoeff = material.specular;
-    float shininess = material.shininess;
-    vec3 specular = specularCoeff * light.color * pow(rdotv, shininess);
-
-   
  
     // return sum of all contributions
     return ambient + diffuse + specular;

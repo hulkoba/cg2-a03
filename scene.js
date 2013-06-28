@@ -108,9 +108,9 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
                              "Show Planet": true,
                              "Show Ring": false,
                              "Debug": true,
-                             "Daytime Texture": false,
+                             "Daytime Texture": true,
                              "Night Lights":false,
-                             "RedGreen": true,
+                             "RedGreen": false,
                              "Glossy Map": false,
                              "Clouds": false
                              };
@@ -153,6 +153,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.programs.planet.setUniform("worldTexture", "bool", this.drawOptions["Daytime Texture"]);
         this.programs.planet.setUniform("night", "bool", this.drawOptions["Night Lights"]);
         this.programs.planet.setUniform("redgreen", "bool", this.drawOptions["RedGreen"]);
+        this.programs.planet.setUniform("glossy", "bool", this.drawOptions["Glossy Map"]);
         this.programs.planet.setUniform("clouds", "bool", this.drawOptions["Clouds"]);
 
 
