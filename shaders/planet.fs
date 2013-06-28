@@ -48,13 +48,16 @@ struct LightSource {
 } ;
 uniform LightSource light;
 
-
+//uniform variable for the checkboxes
 uniform bool debug;
 uniform bool worldTexture;
 uniform bool night;
+uniform bool redgreen;
 
+// uniform variable for the textrues
 uniform sampler2D daylightTexture;
 uniform sampler2D nightlightTexture;
+uniform sampler2D rgTexture;
 
 /*
 
@@ -78,7 +81,12 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     // all sides of the object
     vec3 ambient = material.ambient * ambientLight;
 
-   
+    
+
+    //textures
+    vec3 dayTex = texture2D(daylightTexture, vertexTexCoords_fs).rgb;
+    vec3 nightTex = texture2D(nightlightTexture, vertexTexCoords_fs).rgb;
+    vec3 rgTex = texture2D(rgTexture, vertexTexCoords_fs).rgb;
 
     // is the current fragment's normal pointing away from the light?
     // then we are on the "back" side of the object, as seen from the light
@@ -87,17 +95,19 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     if(!debug){
         //ambient = material.ambient * ambientLight;
         ambient = ambient;
-    }
-   
-
+    }   
+    
     // diffuse contribution
-    vec3 dayTex = texture2D(daylightTexture, vertexTexCoords_fs).rgb;
-    vec3 nightTex = texture2D(nightlightTexture, vertexTexCoords_fs).rgb;
-
     vec3 diffuseCoeff = material.diffuse;
-
     vec3 diffuse ;
   
+    //green land, red water
+    if(redgreen){
+        diffuse = rgTex * light.color * ndotl;
+        ambient = rgTex * ambientLight;
+                   
+    }
+ 
 
     //day or red
     if(worldTexture){

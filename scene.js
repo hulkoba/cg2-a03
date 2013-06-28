@@ -42,6 +42,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         // in 3.3 create textures from image files here...
        this.dayTexture = new texture.Texture2D(gl, "textures/earth_month04.jpg");
        this.nightTexture = new texture.Texture2D(gl, "textures/earth_at_night_2048.jpg");
+       this.redgreenTexture = new texture.Texture2D(gl, "textures/earth_bathymetry_4096.jpg");
 
 
         
@@ -50,9 +51,10 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         texture.onAllTexturesLoaded( (function() {
             // ...
             _scene.programs.planet.use();
-            // uniform-bezeichner, Textureinheit
-            _scene.programs.planet.setTexture("daylightTexture", 0, _scene.dayTexture)
-            _scene.programs.planet.setTexture("nightlightTexture", 1, _scene.nightTexture)
+                                        // uniform-bezeichner, Textureinheit
+            _scene.programs.planet.setTexture("daylightTexture",   0, _scene.dayTexture);
+            _scene.programs.planet.setTexture("nightlightTexture", 1, _scene.nightTexture);
+            _scene.programs.planet.setTexture("rgTexture",         2, _scene.redgreenTexture);
 
             _scene.draw();
         } ));
@@ -104,9 +106,9 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
                              "Show Planet": true,
                              "Show Ring": false,
                              "Debug": true,
-                             "Daytime Texture": true,
+                             "Daytime Texture": false,
                              "Night Lights":false,
-                             "Red Green": false
+                             "RedGreen": true
                              };
     };
 
@@ -146,6 +148,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.programs.planet.setUniform("debug", "bool", this.drawOptions["Debug"]);
         this.programs.planet.setUniform("worldTexture", "bool", this.drawOptions["Daytime Texture"]);
         this.programs.planet.setUniform("night", "bool", this.drawOptions["Night Lights"]);
+        this.programs.planet.setUniform("redgreen", "bool", this.drawOptions["RedGreen"]);
 
 
         // draw the scene
