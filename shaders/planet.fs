@@ -53,11 +53,13 @@ uniform bool debug;
 uniform bool worldTexture;
 uniform bool night;
 uniform bool redgreen;
+uniform bool clouds;
 
 // uniform variable for the textrues
 uniform sampler2D daylightTexture;
 uniform sampler2D nightlightTexture;
 uniform sampler2D rgTexture;
+uniform sampler2D cloudTexture;
 
 /*
 
@@ -87,6 +89,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     vec3 dayTex = texture2D(daylightTexture, vertexTexCoords_fs).rgb;
     vec3 nightTex = texture2D(nightlightTexture, vertexTexCoords_fs).rgb;
     vec3 rgTex = texture2D(rgTexture, vertexTexCoords_fs).rgb;
+    float cloudTex = texture2D(cloudTexture, vertexTexCoords_fs).r;
 
     // is the current fragment's normal pointing away from the light?
     // then we are on the "back" side of the object, as seen from the light
@@ -105,9 +108,17 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     if(redgreen){
         diffuse = rgTex * light.color * ndotl;
         ambient = rgTex * ambientLight;
-                   
+       
+       // irgendwie die texturwerte oder sowas rauskriegen 
+        // if ( rgTex-höhe == vec3(0.0, 0.0, 0.0)) {
+        //     male grün
+        //      diffuse = vec3(0.0, 1.0, 0.0);
+        // }else{ 
+        //      male rot
+        //     diffuse vec3(1.0, 0.0, 0.0);
+        // }           
     }
- 
+
 
     //day or red
     if(worldTexture){
@@ -124,7 +135,12 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
         ambient = nightTex * ambientLight; 
     }
 
-
+    //blablabla
+    if(clouds){
+        //rotkanal der Textur muss noch wie wolkendichte interpretiert werden.
+        diffuse = diffuse + cloudTex;
+        ambient = ambient + cloudTex;
+    }
 
     //draw the green border between 0 and 3°
     if(debug && ndotl >= 0.0 && ndotl < 0.03){

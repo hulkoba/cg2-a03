@@ -43,6 +43,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
        this.dayTexture = new texture.Texture2D(gl, "textures/earth_month04.jpg");
        this.nightTexture = new texture.Texture2D(gl, "textures/earth_at_night_2048.jpg");
        this.redgreenTexture = new texture.Texture2D(gl, "textures/earth_bathymetry_4096.jpg");
+       this.cloudTexture = new texture.Texture2D(gl, "textures/earth_clouds_2048.jpg");
 
 
         
@@ -55,6 +56,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
             _scene.programs.planet.setTexture("daylightTexture",   0, _scene.dayTexture);
             _scene.programs.planet.setTexture("nightlightTexture", 1, _scene.nightTexture);
             _scene.programs.planet.setTexture("rgTexture",         2, _scene.redgreenTexture);
+             _scene.programs.planet.setTexture("cloudTexture",     3, _scene.cloudTexture);
 
             _scene.draw();
         } ));
@@ -108,7 +110,9 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
                              "Debug": true,
                              "Daytime Texture": false,
                              "Night Lights":false,
-                             "RedGreen": true
+                             "RedGreen": true,
+                             "Glossy Map": false,
+                             "Clouds": false
                              };
     };
 
@@ -149,6 +153,7 @@ define(["jquery", "gl-matrix", "util", "program", "shaders", "scene_node",
         this.programs.planet.setUniform("worldTexture", "bool", this.drawOptions["Daytime Texture"]);
         this.programs.planet.setUniform("night", "bool", this.drawOptions["Night Lights"]);
         this.programs.planet.setUniform("redgreen", "bool", this.drawOptions["RedGreen"]);
+        this.programs.planet.setUniform("clouds", "bool", this.drawOptions["Clouds"]);
 
 
         // draw the scene
