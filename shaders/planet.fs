@@ -80,10 +80,14 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     // cosine of angle between light and surface normal.
     float ndotl = dot(n,-l);
 
+    //draw the green border between 0 and 3°
+    if(debug && ndotl >= 0.0 && ndotl < 0.03){
+        return vec3(0.0, 1.0, 0.0);
+    }
+
     // ambient part, this is a constant term shown on the
     // all sides of the object
     vec3 ambient = material.ambient * ambientLight;
-
     
 
     //textures
@@ -96,14 +100,13 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     // then we are on the "back" side of the object, as seen from the light
      
     
-    if(!debug){
+    //if(!debug){
         //ambient = material.ambient * ambientLight;
-        ambient = ambient;
-    }   
+   //     ambient = ambient;
+   // }   
     
     // diffuse contribution
-    vec3 diffuseCoeff = material.diffuse;
-    vec3 diffuse = diffuseCoeff * light.color * ndotl;     
+    vec3 diffuseCoeff;
     
     //Überblendung
     if(worldTexture && night) {
@@ -115,25 +118,14 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
         
     //Nur Nacht
     } else if(!worldTexture && night) {
-        diffuseCoeff = material.diffuse * ndotl + ( 1.0  - ndotl ) * nightTex;
-        //ambient = nightTex * ambientLight;
-
+       diffuseCoeff = material.diffuse * ndotl + ( 1.0  - ndotl ) * nightTex;
+       
     //Wenn beides aus
     } else if(!worldTexture && !night) {
 		diffuseCoeff = material.diffuse * ndotl;
 	}
 
-   diffuse = diffuseCoeff * light.color;
-
-
-
-    
-    // Wolken
-    if(clouds){
-        diffuse = diffuse * (1.0 - cloudTex * ndotl) + cloudTex * ndotl;
-        ambient = ambient + cloudTex;
-    }
-
+   vec3 diffuse = diffuseCoeff * light.color;
       
 
      // reflected light direction = perfect reflection direction
@@ -146,6 +138,12 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     vec3 specularCoeff = material.specular;
     float shininess = material.shininess;
     vec3 specular = specularCoeff * light.color * pow(rdotv, shininess);
+
+    
+    // Wolken
+    if(clouds){
+        diffuse = diffuse * (1.0 - cloudTex * ndotl) + cloudTex * ndotl;
+    }
 
     //Spiegelung in Abhängigkeit von Wasser/Land
    if(glossy){
@@ -162,30 +160,42 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     if(redgreen) {
         //Da wo schwarz ist, Rot zeichnen
 		if(rgTex == vec3(0.0, 0.0, 0.0)) {
-			return vec3(1.0, 0.0, 0.0) + specular;
+			return vec3(0.5, 0.0, 0.0) + specular;
         //Wo alles andere als Schwarz - grün zeichnen
 		} else {
-			return vec3(0.0, 1.0, 0.0) + specular;
+			return vec3(0.0, 0.5, 0.0) + specular;
 		}
         
 	}
+    
+	float faktor = 0.5;
+    vec3 streifen;
 
-    //draw the green border between 0 and 3°
-    if(debug && ndotl >= 0.0 && ndotl < 0.03){
-        ambient = vec3(0.0, 1.0, 0.0);
+    if(ndotl <= 0.0) {
+		if(debug && mod(vertexTexCoords_fs.s, 0.05) >= 0.025) {
+			streifen = ambient * faktor;
+				if(night){
+					streifen = streifen + diffuse * faktor;
+                }
+			return streifen;
+
+		} else {
+			streifen = ambient;
+			if(night) { 
+				streifen = streifen + diffuse;
+			}
+			return streifen;
+		}
+	}
+    
+    
+    if (debug && mod(vertexTexCoords_fs.s, 0.05) >= 0.025) {
+		return ambient * faktor + diffuse * faktor + specular;
+	} else {
+		return ambient + diffuse + specular;
+
     }
-    //draw texture stripes
-    if(debug){
-        if(mod(vertexTexCoords_fs.s , 0.05) >= 0.025){
-            ambient = ambient * 0.8 + diffuse * 0.8;
-        }
-    }
-  
-    if(ndotl < 0.0 )
-        return ambient;
- 
-    // return sum of all contributions
-    return ambient + diffuse + specular;
+
     
 }
 
