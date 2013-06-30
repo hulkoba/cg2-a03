@@ -89,7 +89,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     //textures
     vec3 dayTex = texture2D(daylightTexture, vertexTexCoords_fs).rgb;
     vec3 nightTex = texture2D(nightlightTexture, vertexTexCoords_fs).rgb;
-    vec3 rgTex = texture2D(rgTexture, vertexTexCoords_fs).rgb;
+    float rgTex = texture2D(rgTexture, vertexTexCoords_fs).r;
     float cloudTex = texture2D(cloudTexture, vertexTexCoords_fs).r;
 
     // is the current fragment's normal pointing away from the light?
@@ -102,46 +102,35 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     }   
     
     // diffuse contribution
-    vec3 diffuseCoeff = material.diffuse;
-    vec3 diffuse ;
+    vec3 diffuseCoeff;
     
     
+    //Überblendung
+    if(worldTexture && night) {
+		diffuseCoeff = dayTex * ndotl + ( 1.0 - ndotl ) * nightTex;
+        
+    //Nur Tag
+	} else if(worldTexture&& !night) {
+        diffuseCoeff = dayTex * light.color * ndotl;
+        
+    //Nur Nacht
+    } else if(!worldTexture && night) {
+        diffuseCoeff = material.diffuse * ndotl + ( 1.0 - ndotl ) * nightTex;
+        //ambient = nightTex * ambientLight;
 
-    //green land, red water
-    if(redgreen){
-        diffuse = rgTex * light.color * ndotl;
-        ambient = rgTex * ambientLight;
-       
-       // irgendwie die texturwerte oder sowas rauskriegen 
-        // if ( rgTex-höhe == vec3(0.0, 0.0, 0.0)) {
-        //     male grün
-        //      diffuse = vec3(0.0, 1.0, 0.0);
-        // }else{ 
-        //      male rot
-        //     diffuse vec3(1.0, 0.0, 0.0);
-        // }           
-    }
+    //Wenn beides aus
+    } else if(!worldTexture && !night) {
+		diffuseCoeff = material.diffuse * ndotl;
+	}
+
+    vec3 diffuse = diffuseCoeff * light.color;
 
 
-    //day or red
-    if(worldTexture){
-        diffuse = dayTex * light.color * ndotl * 0.5;
-                
-    } else {
-        diffuse = diffuseCoeff * light.color * ndotl;
-        //ambient = material.ambient * ambientLight;
-        //ambient = ambient;
-    }
+
     
-    // turn on the lights
-    if(night && ndotl < 0.0){
-        ambient = nightTex * ambientLight; 
-    }
-
-    //blablabla
+    // Wolken
     if(clouds){
-        //rotkanal der Textur muss noch wie wolkendichte interpretiert werden.
-        diffuse = diffuse + cloudTex;
+        diffuse = diffuse * (1.0 - cloudTex * ndotl) + cloudTex * ndotl;
         ambient = ambient + cloudTex;
     }
 
@@ -158,13 +147,22 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     float shininess = material.shininess;
     vec3 specular = specularCoeff * light.color * pow(rdotv, shininess);
 
+    //Spiegelung in Abhängigkeit von Wasser/Land
+   if(glossy){
+		if(rgTex <= 0.1) {
+			specular = specularCoeff * 0.5 * light.color * pow(rdotv, shininess / 8.0);
+		}
+   }
 
-    //spacular light depends on water ...
-   // if(glossy){
-        //material.specular || && material. shininess verändern
-        // je nachdem ob auf wasser oder land
-
-   // }
+    //Rot Gründ Karte + Spiegelung
+    if(redgreen) {
+		if(rgTex > 0.1) {
+			return vec3(0.4, 0.0, 0.0) + specular;
+		} else {
+			return vec3(0.0, 0.4, 0.0) + specular;
+		}
+        
+	}
 
     //draw the green border between 0 and 3°
     if(debug && ndotl >= 0.0 && ndotl < 0.03){
