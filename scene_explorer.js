@@ -20,7 +20,7 @@ define(["gl-matrix" ],
     "use strict";
 
     /* 
-
+ 
         Object that handles mouse / keyboard interactions and 
         uses them to manipulate the scene's world transformation
         to allow interactive exploration.
