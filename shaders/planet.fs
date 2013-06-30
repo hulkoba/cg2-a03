@@ -89,7 +89,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     //textures
     vec3 dayTex = texture2D(daylightTexture, vertexTexCoords_fs).rgb;
     vec3 nightTex = texture2D(nightlightTexture, vertexTexCoords_fs).rgb;
-    float rgTex = texture2D(rgTexture, vertexTexCoords_fs).r;
+    vec3 rgTex = texture2D(rgTexture, vertexTexCoords_fs).rgb;
     float cloudTex = texture2D(cloudTexture, vertexTexCoords_fs).r;
 
     // is the current fragment's normal pointing away from the light?
@@ -102,12 +102,12 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
     }   
     
     // diffuse contribution
-    vec3 diffuseCoeff;
-    
+    vec3 diffuseCoeff = material.diffuse;
+    vec3 diffuse = diffuseCoeff * light.color * ndotl;     
     
     //Überblendung
     if(worldTexture && night) {
-		diffuseCoeff = dayTex * ndotl + ( 1.0 - ndotl ) * nightTex;
+		diffuseCoeff = dayTex * ndotl + ( 0.4 - ndotl ) * nightTex;
         
     //Nur Tag
 	} else if(worldTexture&& !night) {
@@ -115,7 +115,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
         
     //Nur Nacht
     } else if(!worldTexture && night) {
-        diffuseCoeff = material.diffuse * ndotl + ( 1.0 - ndotl ) * nightTex;
+        diffuseCoeff = material.diffuse * ndotl + ( 1.0  - ndotl ) * nightTex;
         //ambient = nightTex * ambientLight;
 
     //Wenn beides aus
@@ -123,7 +123,7 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 		diffuseCoeff = material.diffuse * ndotl;
 	}
 
-    vec3 diffuse = diffuseCoeff * light.color;
+   diffuse = diffuseCoeff * light.color;
 
 
 
@@ -149,17 +149,23 @@ vec3 phong(vec3 pos, vec3 n, vec3 v, LightSource light, PhongMaterial material) 
 
     //Spiegelung in Abhängigkeit von Wasser/Land
    if(glossy){
-		if(rgTex <= 0.1) {
-			specular = specularCoeff * 0.5 * light.color * pow(rdotv, shininess / 8.0);
-		}
+		if(rgTex == vec3(0.0, 0.0, 0.0)) {
+            specular = specularCoeff * 0.5 * light.color * pow(rdotv, shininess / 8.0);
+
+        }else {
+            specular = specularCoeff * light.color * pow(rdotv, shininess);
+
+        }
    }
 
     //Rot Gründ Karte + Spiegelung
     if(redgreen) {
-		if(rgTex > 0.1) {
-			return vec3(0.4, 0.0, 0.0) + specular;
+        //Da wo schwarz ist, Rot zeichnen
+		if(rgTex == vec3(0.0, 0.0, 0.0)) {
+			return vec3(1.0, 0.0, 0.0) + specular;
+        //Wo alles andere als Schwarz - grün zeichnen
 		} else {
-			return vec3(0.0, 0.4, 0.0) + specular;
+			return vec3(0.0, 1.0, 0.0) + specular;
 		}
         
 	}
