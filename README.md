@@ -1,2 +1,3 @@
-cg2-a03
-=======
+# Computergraphics 2 task 3
+
+Medieninformatik Bachelor, Beuth Hochschule
